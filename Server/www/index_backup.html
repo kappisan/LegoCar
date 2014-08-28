@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Lego Car</title>
+    <meta name="description" content="Lego Car online!">
+
+	<style>
+		body
+		{
+			background-color:#333333;
+		}
+
+		button
+		{
+			height:50px;
+			width:50px;
+		}
+		#banner
+		{
+			padding-right:0px;
+			background-color:#000;
+		}
+		#movelog
+		{
+			position:absolute;
+			left:1000px;
+			top:220px;
+			overflow-y: auto;
+			background-color:#777;
+			height:400px;
+			width:280px;
+		}
+		#statuslog
+		{
+			position:absolute;
+			left:10px;
+			top:220px;
+			overflow-y: auto;
+			background-color:#777;
+			height:400px;
+			width:280px;
+		}
+
+	</style>
+
+  </head>
+  <body>	
+
+	<div id="statuslog">
+		<center><h2>STATUS</h2></center>
+		<p id = "mdisplay">motors: offline</p>
+		<p id = "sdisplay">sensors: offline</p>
+		<p id = "sondisplay">sonar: offline</p>
+		<p id = "soldisplay">light: offline</p>
+		<p id = "tempdisplay">temp: offline</p>
+	</div>	
+
+	<div id="movelog">
+		<center><h2>LOG</h2></center>
+	</div>	
+
+	<center>
+		<button onMouseDown="forwardDown()" onMouseUp="forwardUp()">^</button><br />
+		<button onMouseDown="leftDown()" onMouseUp="leftUp()">&lt;</button><button onMouseDown="reverseDown()" onMouseUp="reverseUp()">v</button><button onMouseDown="rightDown()" onMouseUp="rightUp()">&gt;</button>
+	</center>
+
+
+    <script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
+    
+    
+    <script>
+      var socket = io.connect('kappisan.com'),
+          keys = {};
+
+	var log = document.getElementById('movelog');
+
+	console.log('hi');
+          
+	socket.on('connect', function(){
+	
+	socket.emit('connect-webclient', true);
+        document.body.addEventListener('keydown', function(e){
+	if(keys[e.keyCode] === true) return;
+		socket.emit('command', e.keyCode + 'down');
+		console.log('pressed');
+		if(e.keyCode == 37) {
+			log.insertAdjacentHTML('beforeend', 'left');
+			log.insertAdjacentHTML('beforeend', '<br />');
+		} else if(e.keyCode == 38) {
+			log.insertAdjacentHTML('beforeend', 'forward');
+			log.insertAdjacentHTML('beforeend', '<br />');
+		} else if(e.keyCode == 39) {
+			log.insertAdjacentHTML('beforeend', 'right');
+			log.insertAdjacentHTML('beforeend', '<br />');
+		} else if(e.keyCode == 40) {
+			log.insertAdjacentHTML('beforeend', 'reverse');
+			log.insertAdjacentHTML('beforeend', '<br />');
+                } else if(e.keyCode == 76) {
+                        log.insertAdjacentHTML('beforeend', 'frontlights');
+                        log.insertAdjacentHTML('beforeend', '<br />');
+                }
+		keys[e.keyCode] = true;
+        }, false);
+        document.body.addEventListener('keyup', function(e){
+		socket.emit('command', e.keyCode + 'up');
+		console.log('released');
+		keys[e.keyCode] = false;
+        }, false);
+      });
+
+      socket.on('motor-online', function(){
+	  document.getElementById("mdisplay").innerHTML = "motors: online";
+      });
+
+      socket.on('sensorsarray', function(data){
+	  console.log('data', data);
+	  if(!data) return;
+
+	  var light = "(dark)";
+	  if(data[1] > 1.2) light = "(dark-ish)";
+	  else if(data[1] > 1) light = "(shady)";
+	  else if(data[1] > 0.7) light = "(fine)";
+	  else if(data[1] > 0.5) light = "(bright)";
+	  else if(data[1] > 0.2) light = "(super bright)";
+	  else light = "(laser)";
+
+	  document.getElementById("sdisplay").innerHTML = "sensors online";
+	  document.getElementById("tempdisplay").innerHTML = "temp: " + data[0];
+	  document.getElementById("soldisplay").innerHTML = "light: " + data[1] + " " + light;
+	  document.getElementById("sondisplay").innerHTML = "sonar: " + data[2];
+      });
+
+	function leftUp() {
+		console.log("37up");
+		socket.emit('command', '37up');
+	}
+
+	function leftDown() {
+		console.log("37down");
+		socket.emit('command', '37down');
+
+		log.insertAdjacentHTML('beforeend', 'left');
+		log.insertAdjacentHTML('beforeend', '<br />');
+	}
+
+	function forwardUp() {
+		console.log("38up");
+		socket.emit('command', '38up');
+	}
+
+	function forwardDown() {
+		console.log("38down");
+		socket.emit('command', '38down');
+
+		log.insertAdjacentHTML('beforeend', 'forward');
+		log.insertAdjacentHTML('beforeend', '<br />');
+	}
+
+	function rightUp() {
+		console.log("39up");
+		socket.emit('command', '39up');
+	}
+
+	function rightDown() {
+		console.log("39down");
+		socket.emit('command', '39down');
+
+		log.insertAdjacentHTML('beforeend', 'right');
+		log.insertAdjacentHTML('beforeend', '<br />');
+	}
+
+	function reverseUp() {
+		console.log("40up");
+		socket.emit('command', '40up');
+	}
+
+	function reverseDown() {
+		console.log("40down");
+		socket.emit('command', '40down');
+
+		log.insertAdjacentHTML('beforeend', 'reverse');
+		log.insertAdjacentHTML('beforeend', '<br />');
+
+	}
+
+    </script>
+  </body>
+<html>
