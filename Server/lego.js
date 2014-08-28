@@ -63,21 +63,9 @@ function handler(req, res){
     'Pragma': 'no-cache'
   });
 
-  var url = require('url');
-  var url_parts = url.parse(req.url, true);
-  var path = url_parts.path;
+  res.write(fs.readFileSync('www/control.html')); 
 
-  console.log(path);
-
-  res.write(fs.readFileSync('www/header.html'));
-
-  if(path == "/control") res.write(fs.readFileSync('www/control.html')); 
-  if(path == "/construction") res.write(fs.readFileSync('www/construction.html')); 
-  else res.write(fs.readFileSync('www/index.html'));
-
-  res.write(fs.readFileSync('www/footer.html'));
 
   res.end();
-
 }
 app.listen(8080);
