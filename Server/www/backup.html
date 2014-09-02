@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Lego Car</title>
+    <meta name="description" content="Lego Car online!">
+
+	<style>
+		body
+		{
+			background-color:#333333;
+			padding-right: 10px;
+			padding-left: 10px;
+		}
+
+		button
+		{
+			height:30px;
+			width:100px;
+		}
+		#banner
+		{
+			padding-right:0px;
+			background-color:#000;
+		}
+		#logtable
+		{
+			position:relative;
+			top:220px;
+			left:10px;
+			overflow-y: auto;
+			background-color:#777;
+			height:900px;
+		}
+		button .backupbutton {
+			height:60px;
+			width:150px;			
+		}
+
+	</style>
+
+  </head>
+  <body>
+	<div id="logtable">
+		<center>
+			<h1>MONGODB BACKUP</h1>
+			<button id="backupbutton" onclick="backup()">BACKUP</button>
+		</center>
+
+		<h2>backups</h2>
+		<div id="backuptable"></div>
+	</div>	
+
+    <script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
+    
+    
+    <script>
+		var socket = io.connect('192.168.0.20:8080'),
+		    keys = {};
+
+		var backupTable = document.getElementById('backuptable');
+
+		function backup() {
+			console.log("backing up");
+			socket.emit('backup-now', true);
+		}
+
+		function restore(data) {
+			console.log("data to restore = " + data);
+			socket.emit('restore-db-to', data);
+		}
+
+		socket.on('send-restorepoints', function(data){
+			console.log(data);
+		});
+
+		socket.on('send-restorepoints', function(data) {
+			console.log('got restore points ' + data);
+
+			var html = "";
+			for(var i = 0; i < data.length; i++) {
+				html += "<p>" + data[i] + " <button onclick=\"restore('"+data[i]+"')\">RESTORE</button></p>";
+			}
+
+			document.getElementById('backuptable').innerHTML = html;
+		});
+
+		socket.emit('connect-webclient', true);
+		socket.emit('request-restorepoints', true);
+
+    </script>
+  </body>
+<html>
