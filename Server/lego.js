@@ -178,6 +178,7 @@ function handler(req, res){
   var query = url_parts.query;
 
   if(url_parts.path == "/backup") res.write(fs.readFileSync('www/backup.html')); 
+  else if(url_parts.path == "/logs") res.write(fs.readFileSync('www/logs.html')); 
   else res.write(fs.readFileSync('www/control.html')); 
 
   res.end();

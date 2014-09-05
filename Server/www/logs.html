@@ -16,8 +16,8 @@
 
 		button
 		{
-			height:50px;
-			width:50px;
+			height:30px;
+			width:100px;
 		}
 		#banner
 		{
@@ -37,26 +37,28 @@
 	</style>
 
   </head>
-  <body>	
-  <center>
+  <body>
 	<div id="logtable">
-		<h1>Logs</h1>
+		<center><h1>Logs</h1></center>
+		<center><button onclick="showConnections()">CONNECTIONS</button><button onclick="showCommands()">COMMANDS</button></center>
+		<div id="content">
+		</div>
 	</div>	
 
     <script src="https://cdn.socket.io/socket.io-1.0.6.js"></script>
     
     
     <script>
-		var socket = io.connect('192.168.0.20:8080'),
-		    keys = {};
 
-		var log = document.getElementById('movelog');
+		var socket = io.connect('192.168.0.20:8080');
 
-		console.log('hi');
-	          
-		socket.on('connect', function(){
-		
-		socket.emit('connect-webclient', true);
+		function showConnections() {
+			document.getElementById('content').innerHTML = "the connections table";
+		}
+
+		function showCommands() {
+			document.getElementById('content').innerHTML = "the commands table";
+		}
 
     </script>
   </body>
